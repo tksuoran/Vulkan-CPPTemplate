@@ -1,33 +1,33 @@
 [submodule "external/glslang"]
-	path = external/glslang
+	path = subprojects/glslang
 	url = git@github.com:KhronosGroup/glslang.git
 [submodule "external/SPIRV-Cross"]
-	path = external/SPIRV-Cross
+	path = subprojects/SPIRV-Cross
 	url = git@github.com:KhronosGroup/SPIRV-Cross.git
 [submodule "external/SPIRV-Headers"]
-	path = external/SPIRV-Headers
+	path = subprojects/SPIRV-Headers
 	url = git@github.com:KhronosGroup/SPIRV-Headers.git
 [submodule "external/SPIRV-Tools"]
-	path = external/SPIRV-Tools
+	path = subprojects/SPIRV-Tools
 	url = git@github.com:KhronosGroup/SPIRV-Tools.git
 [submodule "external/Vulkan-Headers"]
-	path = external/Vulkan-Headers
+	path = subprojects/Vulkan-Headers
 	url = git@github.com:KhronosGroup/Vulkan-Headers.git
 [submodule "external/Vulkan-Loader"]
-	path = external/Vulkan-Loader
+	path = subprojects/Vulkan-Loader
 	url = git@github.com:KhronosGroup/Vulkan-Loader.git
 [submodule "external/Vulkan-ValidationLayers"]
-	path = external/Vulkan-ValidationLayers
+	path = subprojects/Vulkan-ValidationLayers
 	url = git@github.com:KhronosGroup/Vulkan-ValidationLayers.git
 [submodule "external/Vulkan-Tools"]
-	path = external/Vulkan-Tools
+	path = subprojects/Vulkan-Tools
 	url = git@github.com:KhronosGroup/Vulkan-Tools.git
 [submodule "external/VulkanMemoryAllocator"]
-	path = external/VulkanMemoryAllocator
+	path = subprojects/VulkanMemoryAllocator
 	url = git@github.com:GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git
 [submodule "external/fmt"]
-	path = external/fmt
+	path = subprojects/fmt
 	url = git@github.com:fmtlib/fmt.git
 [submodule "external/GSL"]
-	path = external/GSL
+	path = subprojects/GSL
 	url = git@github.com:microsoft/GSL.git

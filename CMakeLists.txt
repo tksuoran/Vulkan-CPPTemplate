@@ -6,6 +6,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_executable(executable
     src/main.cpp
+    src/log.cpp
+    src/log.hpp
 )
 
 set_target_properties(executable PROPERTIES CXX_STANDARD 20 CXX_STANDARD_REQUIRED ON)

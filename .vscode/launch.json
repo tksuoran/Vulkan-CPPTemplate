@@ -11,17 +11,21 @@
             "stopAtEntry":     false,
             "cwd":             "${workspaceFolder}/build",
             "environment": [
-                // {
-                //     "name": "VK_LOADER_DEBUG",
-                //     "value": "all",
-                // },
                 {
-                    "name": "VK_LAYER_PATH",
+                    "name":  "VK_LOADER_DEBUG",
+                    "value": "all",
+                },
+                {
+                    "name":  "VK_LAYER_PATH",
                     "value": "${workspaceFolder}/build"
                 },
                 {
-                    "name": "LD_LIBRARY_PATH",
+                    "name":  "LD_LIBRARY_PATH",
                     "value": "${workspaceFolder}/build"
+                },
+                {
+                    "name":  "VK_INSTANCE_LAYERS",
+                    "value": "VK_LAYER_KHRONOS_validation"
                 }
             ],
             "externalConsole": false

@@ -31,3 +31,18 @@
 [submodule "external/GSL"]
 	path = subprojects/GSL
 	url = git@github.com:microsoft/GSL.git
+[submodule "subprojects/Vulkan-Hpp"]
+	path = subprojects/Vulkan-Hpp
+	url = https://github.com/KhronosGroup/Vulkan-Hpp.git
+[submodule "subprojects/tinyxml2"]
+	path = subprojects/tinyxml2
+	url = https://github.com/leethomason/tinyxml2.git
+[submodule "subprojects/Vulkan-Docs"]
+	path = subprojects/Vulkan-Docs
+	url = https://github.com/KhronosGroup/Vulkan-Docs
+[submodule "Vulkan-ExtensionLayer"]
+	path = Vulkan-ExtensionLayer
+	url = https://github.com/KhronosGroup/Vulkan-ExtensionLayer.git
+[submodule "subprojects/Vulkan-ExtensionLayer"]
+	path = subprojects/Vulkan-ExtensionLayer
+	url = https://github.com/KhronosGroup/Vulkan-ExtensionLayer.git

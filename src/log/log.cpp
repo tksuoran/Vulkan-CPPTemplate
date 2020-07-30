@@ -10,7 +10,7 @@
 #    include <unistd.h>
 #endif
 
-namespace vipu::log
+namespace vipu
 {
 
 

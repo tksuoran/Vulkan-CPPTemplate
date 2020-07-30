@@ -1,6 +1,7 @@
 {
     "version": "0.2.0",
     "configurations": [
+        // executable
         {
             "name":            "executable",
             "type":            "cppdbg",
@@ -17,11 +18,11 @@
                 },
                 {
                     "name":  "VK_LAYER_PATH",
-                    "value": "${workspaceFolder}/build"
+                    "value": "${workspaceFolder}/build/subprojects/Vulkan-ValidationLayers/layers"
                 },
                 {
                     "name":  "LD_LIBRARY_PATH",
-                    "value": "${workspaceFolder}/build"
+                    "value": "${workspaceFolder}/build/subprojects/Vulkan-ValidationLayers/layers"
                 },
                 {
                     "name":  "VK_INSTANCE_LAYERS",
@@ -30,5 +31,83 @@
             ],
             "externalConsole": false
         },
-    ],
+        // vkcubepp
+        {
+            "name":            "vkcubepp",
+            "type":            "cppdbg",
+            "request":         "launch",
+            "program":         "${workspaceFolder}/build/subprojects/Vulkan-Tools/cube/vkcubepp",
+            "preLaunchTask":   "make vkcubepp",
+            "args":            [
+                "--validate",
+                //"--c", "100"
+            ],
+            "stopAtEntry":     false,
+            "cwd":             "${workspaceFolder}/build",
+            "environment": [
+                // {
+                //     "name":  "VK_LOADER_DEBUG",
+                //     "value": "all",
+                // },
+                // {
+                //     "name":  "VK_LAYER_PATH",
+                //     "value": "${workspaceFolder}/build/subprojects/Vulkan-ValidationLayers/layers"
+                // },
+                // {
+                //     "name":  "LD_LIBRARY_PATH",
+                //     "value": "${workspaceFolder}/build/subprojects/Vulkan-ValidationLayers/layers"
+                // }
+            ],
+            "externalConsole": false
+        },
+        // vkcube
+        {
+            "name":            "vkcube",
+            "type":            "cppdbg",
+            "request":         "launch",
+            "program":         "${workspaceFolder}/build/subprojects/Vulkan-Tools/cube/vkcube",
+            "preLaunchTask":   "make vkcube",
+            "args":            [
+                "--validate",
+                //"--c", "100"
+            ],
+            "stopAtEntry":     false,
+            "cwd":             "${workspaceFolder}/build",
+            "environment": [
+                // {
+                //     "name":  "VK_LOADER_DEBUG",
+                //     "value": "all",
+                // },
+                // {
+                //     "name":  "VK_LAYER_PATH",
+                //     "value": "${workspaceFolder}/build/subprojects/Vulkan-ValidationLayers/layers"
+                // },
+                // {
+                //     "name":  "LD_LIBRARY_PATH",
+                //     "value": "${workspaceFolder}/build/subprojects/Vulkan-ValidationLayers/layers"
+                // }
+            ],
+            "externalConsole": false
+        },
+        // vkcube from VULKAN_SDK
+        {
+            "name":            "${VULKAN_SDK}/bin/vkcube",
+            "type":            "cppdbg",
+            "request":         "launch",
+            "program":         "${env:VULKAN_SDK}/bin/vkcube",
+            "args":            [
+                "--validate",
+                //"--c", "100"
+            ],
+            "stopAtEntry":     false,
+            "cwd":             "${workspaceFolder}",
+            "environment": [
+                {
+                    "name":  "VK_LOADER_DEBUG",
+                    "value": "all",
+                }
+            ],
+            "externalConsole": false
+        }
+    ]
 }

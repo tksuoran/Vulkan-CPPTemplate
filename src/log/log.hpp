@@ -5,7 +5,34 @@
 #include <array>
 #include <string>
 
-namespace vipu::log
+#if _MSC_VER
+
+#if defined(_WIN32)
+#   define _CRT_SECURE_NO_WARNINGS
+#   ifndef WIN32_LEAN_AND_MEAN
+#       define WIN32_LEAN_AND_MEAN
+#   endif
+#   define VC_EXTRALEAN
+#   ifndef STRICT
+#       define STRICT
+#   endif
+#   ifndef NOMINMAX
+#       define NOMINMAX       // Macros min(a,b) and max(a,b)
+#   endif
+#   include <windows.h>
+#endif
+
+#define FATAL(format, ...) do { fmt::print("{}:{} " format, __FILE__, __LINE__, ##__VA_ARGS__); DebugBreak(); abort(); } while (1)
+#define VERIFY(expression) do { if (!(expression)) { FATAL("assert {} failed in {}", #expression, __func__); } } while (0)
+
+#else
+
+#define FATAL(format, ...) do { fmt::print("{}:{} " format, __FILE__, __LINE__, ##__VA_ARGS__); __builtin_trap(); __builtin_unreachable(); } while (1)
+#define VERIFY(expression) do { if (!(expression)) { FATAL("assert {} failed in {}", #expression, __func__); } } while (0)
+
+#endif
+
+namespace vipu
 {
 
 struct Log
@@ -23,6 +50,7 @@ struct Log
         static constexpr int LEVEL_INFO {2};
         static constexpr int LEVEL_WARN {3};
         static constexpr int LEVEL_ERROR{4};
+        static constexpr int LEVEL_FATAL{5};
     };
 
     struct Color
@@ -154,32 +182,5 @@ struct Log
 };
 
 } // namespace vipu::log
-
-#if _MSC_VER
-
-#if defined(_WIN32)
-#   define _CRT_SECURE_NO_WARNINGS
-#   ifndef WIN32_LEAN_AND_MEAN
-#       define WIN32_LEAN_AND_MEAN
-#   endif
-#   define VC_EXTRALEAN
-#   ifndef STRICT
-#       define STRICT
-#   endif
-#   ifndef NOMINMAX
-#       define NOMINMAX       // Macros min(a,b) and max(a,b)
-#   endif
-#   include <windows.h>
-#endif
-
-#define FATAL(format, ...) do { fmt::print("{}:{} " format, __FILE__, __LINE__, ##__VA_ARGS__); DebugBreak(); abort(); } while (1)
-#define VERIFY(expression) do { if (!(expression)) { FATAL("assert {} failed in {}", #expression, __func__); } } while (0)
-
-#else
-
-#define FATAL(format, ...) do { fmt::print("{}:{} " format, __FILE__, __LINE__, ##__VA_ARGS__); __builtin_trap(); __builtin_unreachable(); } while (1)
-#define VERIFY(expression) do { if (!(expression)) { FATAL("assert {} failed in {}", #expression, __func__); } } while (0)
-
-#endif
 
 #endif

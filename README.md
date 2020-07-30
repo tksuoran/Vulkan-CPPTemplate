@@ -4,5 +4,7 @@ An example how to build Vulkan C++ application using github Khronos submodules i
 
 - No Vulkan SDK needed
 - Github Khronos repositories are used directly as submodules
-- License: MIT. See [LICENSE.txt]
+- License:
+    - Original code: MIT. See [LICENSE.txt]
+    - Parts of VKB:  Apache V2
 - Basic .vscode files for easy build and debug

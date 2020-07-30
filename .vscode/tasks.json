@@ -1,74 +1,67 @@
 {
-    // See https://go.microsoft.com/fwlink/?LinkId=733558
-    // for the documentation about the tasks.json format
     "version": "2.0.0",
     "tasks": [
+        // CMake configure make
         {
-            "label": "CMake configure make",
-            "type": "shell",
-            "command": "mkdir -p ${workspaceFolder}/build && cd ${workspaceFolder}/build && cmake -G \"Unix Makefiles\" -DCMAKE_BUILD_TYPE=Debug ${workspaceFolder}",
+            "label":   "CMake configure make",
+            "type":    "shell",
+            "command": "cmake -B ${workspaceFolder}/build -S ${workspaceFolder} -G \"Unix Makefiles\" -DCMAKE_BUILD_TYPE=Debug",
             "group": {
-                "kind": "build",
-                "isDefault": true
+                "kind":         "build",
+                "isDefault":    true
             },
             "problemMatcher": {
-                "base": "$gcc",
+                "base":         "$gcc",
                 "fileLocation": "autoDetect"
             },
             "presentation": {
                 "clear": true
             }
         },
+        // make build
         {
-            "label": "make build",
-            "type": "shell",
+            "label":   "make build",
+            "type":    "shell",
             "command": "make -j8 -C ${workspaceFolder}/build",
             "problemMatcher": {
-                "base": "$gcc",
+                "base":         "$gcc",
                 "fileLocation": "autoDetect"
             },
             "group": {
-                "kind": "build",
+                "kind":      "build",
                 "isDefault": true
             },
             "presentation": {
                 "clear": true
             }
         },
+        // make clean
         {
-            "label": "make clean",
-            "type": "shell",
+            "label":   "make clean",
+            "group":   "build",
+            "type":    "shell",
             "command": "make clean -C ${workspaceFolder}/build",
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": "autoDetect"
             },
-            "group": "build",
             "presentation": {
                 "clear": true
             }
         },
+        // rm -fr build
         {
-            "label": "rm -fr build",
-            "type": "shell",
+            "label":   "rm -fr build",
+            "group":   "build",
+            "type":    "shell",
             "command": "rm -fr ${workspaceFolder}/build",
             "problemMatcher": {
                 "base": "$gcc",
-                "fileLocation": "absolute"
+                "fileLocation": "autoDetect"
             },
-
-            "group": "build",
             "presentation": {
                 "clear": true
             }
-        },
-        {
-            "label": "Clean",
-            "type": "shell",
-            "command": "make clean",
-            "problemMatcher": [
-                "$gcc"
-            ]
         }
     ]
 }

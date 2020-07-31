@@ -24,8 +24,7 @@ class Display_surface
     : public Surface
 {
 public:
-    Display_surface(Configuration   *configuration,
-                    Instance        *instance,
+    Display_surface(vk::Instance     vk_instance,
                     Physical_device *physical_device);
 
 private:

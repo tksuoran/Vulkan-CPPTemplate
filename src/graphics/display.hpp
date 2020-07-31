@@ -31,7 +31,7 @@ public:
 class Display
 {
 public:
-    Display(Physical_device           *physical_device,
+    Display(vk::PhysicalDevice         physical_device,
             uint32_t                   display_index,
             vk::DisplayProperties2KHR &properties);
 
@@ -45,8 +45,6 @@ public:
     -> uint32_t;
 
 private:
-    Physical_device                            *m_physical_device{nullptr};
-    vk::PhysicalDevice                          m_vk_physical_device;
     vk::DisplayKHR                              m_vk_display;
     vk::DisplayProperties2KHR                   m_properties;
     std::vector<vk::DisplayModeProperties2KHR>  m_mode_properties;

@@ -14,23 +14,26 @@ class Surface;
 /// Owns:
 ///  - Vulkan device
 ///  - Vulkan queue
-///  - Vulkan surface
 class Device
 {
 public:
     Device(Physical_device *physical_device,
            Surface         *surface);
 
-    void create_swapchain();
+    auto get()
+    -> vk::Device;
+
+    auto get_queue_family_indices()
+    -> const Queue_family_indices &;
+
+    auto get_surface_formats(vk::SurfaceKHR vk_surface)
+    -> std::vector<vk::SurfaceFormatKHR>;
 
 private:
-    Physical_device        *m_physical_device;
-    vk::PhysicalDevice       m_vk_physical_device;
-    vk::UniqueDevice         m_vk_device;
-    vk::Queue                m_vk_queue;
-    vk::UniqueSwapchainKHR   m_vk_swapchain;
-    Surface                 *m_surface;
-    Queue_family_indices     m_queue_family_indices;
+    vk::UniqueDevice     m_vk_device;
+    vk::PhysicalDevice   m_vk_physical_device;
+    vk::Queue            m_vk_queue;
+    Queue_family_indices m_queue_family_indices;
 };
 
 } // namespace vipu

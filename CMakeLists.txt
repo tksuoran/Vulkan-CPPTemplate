@@ -219,6 +219,8 @@ add_executable(executable
     src/graphics/physical_device.hpp
     src/graphics/surface.cpp
     src/graphics/surface.hpp
+    src/graphics/swapchain.cpp
+    src/graphics/swapchain.hpp
     src/graphics/xcb_surface.cpp
     src/graphics/xcb_surface.hpp
     src/log/log.cpp

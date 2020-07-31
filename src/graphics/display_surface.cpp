@@ -10,18 +10,19 @@
 namespace vipu
 {
 
-Display_surface::Display_surface(Configuration   *configuration,
-                                 Instance        *instance,
+Display_surface::Display_surface(vk::Instance     vk_instance,
                                  Physical_device *physical_device)
-    : Surface{configuration, instance, physical_device}
 {
-    Expects(configuration->surface_type == Surface::Type::eDisplay);
+    Expects(physical_device != nullptr);
+
+    auto vk_physical_device = physical_device->get();
+    VERIFY(vk_physical_device);
 
     m_display = physical_device->choose_display();
 
     VERIFY(m_display != nullptr);
 
-    auto m_vk_display = m_display->get();
+    m_vk_display = m_display->get();
 
     // TODO Choose display mode
     m_display_mode = m_display->get_mode_properties().front().displayModeProperties.displayMode;
@@ -34,7 +35,7 @@ Display_surface::Display_surface(Configuration   *configuration,
     Ensures(m_display_plane_index != std::numeric_limits<uint32_t>::max());
 
     vk::DisplayPlaneInfo2KHR plane_info_key{m_display_mode, m_display_plane_index};
-    auto capabilities = m_vk_physical_device.getDisplayPlaneCapabilities2KHR(plane_info_key);
+    auto capabilities = vk_physical_device.getDisplayPlaneCapabilities2KHR(plane_info_key);
 
     auto extent = capabilities.capabilities.maxDstExtent;
 
@@ -54,12 +55,14 @@ Display_surface::Display_surface(Configuration   *configuration,
         extent
     };
 
-    m_vk_surface = m_vk_instance.createDisplayPlaneSurfaceKHRUnique(surface_create_info);
+    m_vk_surface = vk_instance.createDisplayPlaneSurfaceKHRUnique(surface_create_info);
 
     log_vulkan.trace("Created surface {} x {} on plane index {}\n",
                      extent.width,
                      extent.height,
                      m_display_plane_index);
+
+    Surface::get_properties(vk_physical_device);
 
     Ensures(m_vk_surface);
 }

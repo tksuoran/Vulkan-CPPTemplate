@@ -1,6 +1,8 @@
 #ifndef surface_hpp_vipu_graphics
 #define surface_hpp_vipu_graphics
 
+#include <vector>
+
 #include "graphics/vulkan.hpp"
 
 namespace vipu
@@ -23,22 +25,23 @@ public:
         eDisplay
     };
 
-    Surface(Configuration   *configuration,
-            Instance        *instance,
-            Physical_device *physical_device);
-
-    auto choose_format()
+    auto choose_format(vk::PhysicalDevice vk_physical_device)
     -> vk::SurfaceFormatKHR;
 
     auto get()
     -> vk::SurfaceKHR;
 
+    auto get_present_modes()
+    -> const std::vector<vk::PresentModeKHR> &;
+
+    auto get_capabilities()
+    -> const vk::SurfaceCapabilitiesKHR &;
+
 protected:
-    Configuration      *m_configuration  {nullptr};
-    Instance           *m_instance       {nullptr};
-    Physical_device    *m_physical_device{nullptr};
-    vk::Instance        m_vk_instance;
-    vk::PhysicalDevice  m_vk_physical_device;
+    void get_properties(vk::PhysicalDevice vk_physical_device);
+
+    std::vector<vk::PresentModeKHR> m_present_modes;
+    vk::SurfaceCapabilitiesKHR      m_surface_capabilities;
 
     bool                 m_quit {false};
     bool                 m_pause{false};

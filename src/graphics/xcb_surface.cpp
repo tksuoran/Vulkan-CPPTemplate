@@ -7,23 +7,20 @@
 namespace vipu
 {
 
-XCB_surface::XCB_surface(Configuration   *configuration,
-                         Instance        *instance,
-                         Physical_device *physical_device)
-    : Surface{configuration, instance, physical_device}
+XCB_surface::XCB_surface(vk::Instance       vk_instance,
+                         vk::PhysicalDevice vk_physical_device)
 {
-    Expects(m_configuration->surface_type == Surface::Type::eXCB);
+    Expects(vk_instance);
+    Expects(vk_physical_device);
 
     xcb_init_connection();
     xcb_create_window_();
 
-    create_xcb_surface();
+    create_xcb_surface(vk_instance, vk_physical_device);
 }
 
 void XCB_surface::xcb_init_connection()
 {
-    Expects(m_configuration->surface_type == Surface::Type::eXCB);
-
     const char *display_envar = getenv("DISPLAY");
     if ((display_envar == nullptr) || display_envar[0] == '\0') {
         FATAL("Environment variable DISPLAY requires a valid value.\nExiting ...\n");
@@ -49,8 +46,6 @@ void XCB_surface::xcb_init_connection()
 
 void XCB_surface::xcb_create_window_()
 {
-    Expects(m_configuration->surface_type == Surface::Type::eXCB);
-
     m_xcb_window = xcb_generate_id(m_xcb_connection);
 
     uint32_t value_mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
@@ -92,9 +87,11 @@ void XCB_surface::xcb_create_window_()
     xcb_configure_window(m_xcb_connection, m_xcb_window, XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y, coords);
 }
 
-void XCB_surface::create_xcb_surface()
+void XCB_surface::create_xcb_surface(vk::Instance       vk_instance,
+                                     vk::PhysicalDevice vk_physical_device)
 {
-    Expects(m_configuration->surface_type == Surface::Type::eXCB);
+    Expects(vk_instance);
+    Expects(vk_physical_device);
 
     vk::XcbSurfaceCreateInfoKHR surface_create_info
     {
@@ -103,16 +100,17 @@ void XCB_surface::create_xcb_surface()
         m_xcb_window
     };
 
-    m_vk_surface = m_vk_instance.createXcbSurfaceKHRUnique(surface_create_info);
+    m_vk_surface = vk_instance.createXcbSurfaceKHRUnique(surface_create_info);
 
     log_vulkan.trace("Created XCB surface\n");
+
+    Surface::get_properties(vk_physical_device);
 
     Ensures(m_vk_surface);
 }
 
 void XCB_surface::xcb_handle_event(const xcb_generic_event_t *event)
 {
-    Expects(m_configuration->surface_type == Surface::Type::eXCB);
     Expects(event != nullptr);
 
     uint8_t event_code = event->response_type & 0x7fu;
@@ -185,8 +183,6 @@ void XCB_surface::xcb_handle_event(const xcb_generic_event_t *event)
 
 void XCB_surface::xcb_run()
 {
-    Expects(m_configuration->surface_type == Surface::Type::eXCB);
-
     xcb_flush(m_xcb_connection);
 
     while (!m_quit)

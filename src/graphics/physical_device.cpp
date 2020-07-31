@@ -90,7 +90,7 @@ void Physical_device::scan_displays()
         display_index < display_properties.size();
         ++display_index)
     {
-        m_displays[display_index] = Display(this,
+        m_displays[display_index] = Display(get(),
                                             display_index,
                                             display_properties[display_index]);
     }

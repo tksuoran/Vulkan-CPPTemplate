@@ -1,1 +1,3 @@
 build
+res/shaders/*.json
+res/shaders/*.spv

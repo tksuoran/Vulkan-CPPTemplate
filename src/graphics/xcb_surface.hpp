@@ -10,15 +10,15 @@ class XCB_surface
     : public Surface
 {
 public:
-    XCB_surface(Configuration   *configuration,
-                Instance        *instance,
-                Physical_device *physical_device);
+    XCB_surface(vk::Instance       vk_instance,
+                vk::PhysicalDevice vk_physical_device);
 
+private:
     void xcb_init_connection();
 
     void xcb_create_window_();
 
-    void create_xcb_surface();
+    void create_xcb_surface(vk::Instance instance, vk::PhysicalDevice vk_physical_device);
 
     void xcb_handle_event(const xcb_generic_event_t *event);
 
@@ -26,7 +26,6 @@ public:
 
     void update();
 
-private:
     xcb_window_t             m_xcb_window               {0};
     xcb_screen_t            *m_xcb_screen               {nullptr};
     xcb_connection_t        *m_xcb_connection           {nullptr};

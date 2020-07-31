@@ -7,22 +7,18 @@
 namespace vipu
 {
 
-Display::Display(Physical_device           *physical_device,
+Display::Display(vk::PhysicalDevice         vk_physical_device,
                  uint32_t                   display_index,
                  vk::DisplayProperties2KHR &properties)
-:   m_physical_device   {physical_device}
-,   m_vk_physical_device{physical_device->get()}
-,   m_vk_display        {properties.displayProperties.display}
-,   m_properties        {properties}
-,   m_display_index     {display_index}
+:   m_properties   {properties}
+,   m_display_index{display_index}
 {
-    Expects(physical_device != nullptr);
-    Expects(m_vk_physical_device);
+    Expects(vk_physical_device);
     Expects(m_vk_display);
 
     std::string name{m_properties.displayProperties.displayName};
     log_vulkan.trace("Display {}: {}\n", display_index, name);
-    m_mode_properties = m_vk_physical_device.getDisplayModeProperties2KHR(m_properties.displayProperties.display);
+    m_mode_properties = vk_physical_device.getDisplayModeProperties2KHR(m_properties.displayProperties.display);
 
     log_vulkan.trace("\tModes: {}\n", m_mode_properties.size());
     for (size_t mode_index = 0;
@@ -37,7 +33,7 @@ Display::Display(Physical_device           *physical_device,
                          p.refreshRate);
     }
 
-    auto plane_properties = m_vk_physical_device.getDisplayPlaneProperties2KHR();
+    auto plane_properties = vk_physical_device.getDisplayPlaneProperties2KHR();
     log_vulkan.trace("\tPlanes: {}\n", plane_properties.size());
     m_planes.resize(plane_properties.size());
     m_display_plane_index = std::numeric_limits<uint32_t>::max();
@@ -45,7 +41,7 @@ Display::Display(Physical_device           *physical_device,
         plane_index < plane_properties.size();
         ++plane_index)
     {
-        m_planes[plane_index] = Plane(m_vk_physical_device,
+        m_planes[plane_index] = Plane(vk_physical_device,
                                       m_vk_display,
                                       plane_index,
                                       plane_properties[plane_index]);

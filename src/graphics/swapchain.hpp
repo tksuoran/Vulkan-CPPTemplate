@@ -6,20 +6,22 @@
 namespace vipu
 {
 
-class Device;
-class Surface;
+class Context;
 
 class Swapchain
 {
 public:
-    Swapchain(Device  *device,
-              Surface *surface);
+    Swapchain(Context &context);
 
     auto get()
     -> vk::SwapchainKHR;
 
+    auto get_surface_format()
+    -> vk::SurfaceFormatKHR;
+
 protected:
     vk::UniqueSwapchainKHR m_vk_swapchain;
+    vk::SurfaceFormatKHR   m_surface_format;
 };
 
 } // namespace vipu

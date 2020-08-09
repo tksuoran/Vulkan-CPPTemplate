@@ -9,16 +9,12 @@
 namespace vipu
 {
 
-class Surface;
+class Context;
 
-/// Owns:
-///  - Vulkan device
-///  - Vulkan queue
 class Device
 {
 public:
-    Device(Physical_device *physical_device,
-           Surface         *surface);
+    Device(Context &context);
 
     auto get()
     -> vk::Device;
@@ -26,12 +22,11 @@ public:
     auto get_queue_family_indices()
     -> const Queue_family_indices &;
 
-    auto get_surface_formats(vk::SurfaceKHR vk_surface)
-    -> std::vector<vk::SurfaceFormatKHR>;
+    auto get_queue()
+    -> vk::Queue;
 
 private:
     vk::UniqueDevice     m_vk_device;
-    vk::PhysicalDevice   m_vk_physical_device;
     vk::Queue            m_vk_queue;
     Queue_family_indices m_queue_family_indices;
 };

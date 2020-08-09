@@ -10,28 +10,16 @@
 namespace vipu
 {
 
-class Configuration;
-class Display;
-class Instance;
-class Physical_device;
+class Context;
 
-/// Display surface
-///  - specific Vulkan device
-///  - specific Vulkan display
-///  - specific Vulkan display mode
-///  - specific Vulkan display plane
 class Display_surface
     : public Surface
 {
 public:
-    Display_surface(vk::Instance     vk_instance,
-                    Physical_device *physical_device);
+    Display_surface(Context &context);
 
 private:
-    Display            *m_display;
-    vk::DisplayKHR      m_vk_display;
     vk::DisplayModeKHR  m_display_mode;
-    uint32_t            m_display_index      {std::numeric_limits<uint32_t>::max()};
     uint32_t            m_display_plane_index{std::numeric_limits<uint32_t>::max()};
 };
 

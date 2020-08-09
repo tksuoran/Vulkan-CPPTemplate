@@ -1,26 +1,20 @@
 #include <gsl/gsl>
 
-#include "graphics/log.hpp"
-#include "graphics/configuration.hpp"
-#include "graphics/instance.hpp"
 #include "graphics/physical_device.hpp"
+#include "graphics/context.hpp"
+#include "graphics/log.hpp"
+#include "graphics/instance.hpp"
 #include "graphics/surface.hpp"
 
 namespace vipu
 {
 
-Physical_device::Physical_device(Configuration      *configuration,
-                                 Instance           *instance,
-                                 vk::PhysicalDevice  physical_device)
-:   m_configuration     {configuration}
-,   m_instance          {instance}
-,   m_vk_instance       {instance->get()}
-,   m_vk_physical_device{physical_device}
+Physical_device::Physical_device(Context &context, vk::PhysicalDevice vk_physical_device)
+:   m_vk_physical_device{vk_physical_device}
 {
-    Expects(configuration != nullptr);
-    Expects(instance != nullptr);
-    Expects(m_vk_instance);
-    Expects(m_vk_physical_device);
+    Expects(context.instance != nullptr);
+    Expects(context.vk_instance);
+    Expects(vk_physical_device);
 
     m_extensions = m_vk_physical_device.enumerateDeviceExtensionProperties();
     log_vulkan.trace("\tFound {} device extensions\n", m_extensions.size());
@@ -66,10 +60,10 @@ Physical_device::Physical_device(Configuration      *configuration,
     m_features                = m_vk_physical_device.getFeatures2();
     m_memory_properties       = m_vk_physical_device.getMemoryProperties2();
 
-    if (configuration->surface_type == Surface::Type::eDisplay)
+    if (context.surface_type == Surface::Type::eDisplay)
     {
         // Scan displays connected to physical device
-        scan_displays();
+        scan_displays(context);
     }
 }
 
@@ -79,7 +73,7 @@ auto Physical_device::get()
     return m_vk_physical_device;
 }
 
-void Physical_device::scan_displays()
+void Physical_device::scan_displays(Context &context)
 {
     Expects(m_vk_physical_device);
 
@@ -90,20 +84,19 @@ void Physical_device::scan_displays()
         display_index < display_properties.size();
         ++display_index)
     {
-        m_displays[display_index] = Display(get(),
-                                            display_index,
-                                            display_properties[display_index]);
+        m_displays.emplace_back(get(),
+                                display_index,
+                                display_properties[display_index]);
     }
+    log_vulkan.trace("Parsed {} displays\n", m_displays.size());
 }
 
-auto Physical_device::choose_queue_family_indices(Surface *surface)
+auto Physical_device::choose_queue_family_indices(Context &context)
 -> Queue_family_indices
 {
     Expects(m_vk_physical_device);
+    Expects(context.vk_surface);
     Expects(!m_queue_family_properties.empty());
-
-    auto vk_surface = surface->get();
-    VERIFY(vk_surface);
 
     // Find queue family supporting both graphics and present
     uint32_t graphics_queue_family_index = std::numeric_limits<uint32_t>::max();
@@ -112,7 +105,7 @@ auto Physical_device::choose_queue_family_indices(Surface *surface)
          queue_family_index < m_queue_family_properties.size();
          ++queue_family_index)
     {
-        bool present_supported = m_vk_physical_device.getSurfaceSupportKHR(queue_family_index, vk_surface);
+        bool present_supported = m_vk_physical_device.getSurfaceSupportKHR(queue_family_index, context.vk_surface);
         vk::QueueFlags flags = m_queue_family_properties[queue_family_index].queueFamilyProperties.queueFlags;
         bool graphics_supported = (flags & vk::QueueFlagBits::eGraphics) == vk::QueueFlagBits::eGraphics;
         if (graphics_supported)
@@ -139,15 +132,24 @@ auto Physical_device::choose_queue_family_indices(Surface *surface)
     return { graphics_queue_family_index, present_queue_family_index};
 }
 
-auto Physical_device::choose_display()
+auto Physical_device::choose_display(bool use_current_display)
 -> Display *
 {
     Expects(!m_displays.empty());
 
     // TODO Choose display
-    auto *display = &m_displays[0];
-
-    return display;
+    for (auto &display : m_displays)
+    {
+        if (use_current_display && display.is_any_current())
+        {
+            return &display;
+        }
+        else if (!use_current_display && !display.is_any_current())
+        {
+            return &display;
+        }
+    }
+    return nullptr;
 }
 
 } // namespace vipu

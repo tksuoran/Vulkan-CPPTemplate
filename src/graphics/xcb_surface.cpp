@@ -1,22 +1,21 @@
 #include <gsl/gsl>
 
 #include "graphics/xcb_surface.hpp"
-#include "graphics/configuration.hpp"
+#include "graphics/context.hpp"
 #include "graphics/log.hpp"
 
 namespace vipu
 {
 
-XCB_surface::XCB_surface(vk::Instance       vk_instance,
-                         vk::PhysicalDevice vk_physical_device)
+XCB_surface::XCB_surface(Context &context)
 {
-    Expects(vk_instance);
-    Expects(vk_physical_device);
+    Expects(context.vk_instance);
+    Expects(context.vk_physical_device);
 
     xcb_init_connection();
     xcb_create_window_();
 
-    create_xcb_surface(vk_instance, vk_physical_device);
+    create_xcb_surface(context);
 }
 
 void XCB_surface::xcb_init_connection()
@@ -87,11 +86,10 @@ void XCB_surface::xcb_create_window_()
     xcb_configure_window(m_xcb_connection, m_xcb_window, XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y, coords);
 }
 
-void XCB_surface::create_xcb_surface(vk::Instance       vk_instance,
-                                     vk::PhysicalDevice vk_physical_device)
+void XCB_surface::create_xcb_surface(Context &context)
 {
-    Expects(vk_instance);
-    Expects(vk_physical_device);
+    Expects(context.vk_instance);
+    Expects(context.vk_physical_device);
 
     vk::XcbSurfaceCreateInfoKHR surface_create_info
     {
@@ -100,16 +98,16 @@ void XCB_surface::create_xcb_surface(vk::Instance       vk_instance,
         m_xcb_window
     };
 
-    m_vk_surface = vk_instance.createXcbSurfaceKHRUnique(surface_create_info);
+    m_vk_surface = context.vk_instance.createXcbSurfaceKHRUnique(surface_create_info);
 
     log_vulkan.trace("Created XCB surface\n");
 
-    Surface::get_properties(vk_physical_device);
+    Surface::get_properties(context);
 
     Ensures(m_vk_surface);
 }
 
-void XCB_surface::xcb_handle_event(const xcb_generic_event_t *event)
+void XCB_surface::xcb_handle_event(Context &context, const xcb_generic_event_t *event)
 {
     Expects(event != nullptr);
 
@@ -154,7 +152,7 @@ void XCB_surface::xcb_handle_event(const xcb_generic_event_t *event)
 
                 case 0x41u:  // space bar
                 {
-                    m_pause = ~m_pause;
+                    context.pause = ~context.pause;
                     break;
                 }
             }
@@ -181,15 +179,15 @@ void XCB_surface::xcb_handle_event(const xcb_generic_event_t *event)
     }
 }
 
-void XCB_surface::xcb_run()
+void XCB_surface::xcb_run(Context &context)
 {
     xcb_flush(m_xcb_connection);
 
-    while (!m_quit)
+    while (!context.quit)
     {
         xcb_generic_event_t *event;
 
-        if (m_pause)
+        if (context.pause)
         {
             event = xcb_wait_for_event(m_xcb_connection);
         }
@@ -200,7 +198,7 @@ void XCB_surface::xcb_run()
 
         while (event)
         {
-            xcb_handle_event(event);
+            xcb_handle_event(context, event);
             free(event);
             event = xcb_poll_for_event(m_xcb_connection);
         }

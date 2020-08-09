@@ -1,41 +1,40 @@
 #include <gsl/gsl>
 
 #include "log/log.hpp"
-#include "graphics/log.hpp"
-#include "graphics/configuration.hpp"
+#include "graphics/context.hpp"
 #include "graphics/display_surface.hpp"
 #include "graphics/instance.hpp"
+#include "graphics/log.hpp"
 #include "graphics/physical_device.hpp"
 
 namespace vipu
 {
 
-Display_surface::Display_surface(vk::Instance     vk_instance,
-                                 Physical_device *physical_device)
+Display_surface::Display_surface(Context &context)
 {
-    Expects(physical_device != nullptr);
+    Expects(context.physical_device != nullptr);
+    Expects(context.vk_physical_device);
 
-    auto vk_physical_device = physical_device->get();
-    VERIFY(vk_physical_device);
+    context.display = context.physical_device->choose_display(true);
+    VERIFY(context.display != nullptr);
 
-    m_display = physical_device->choose_display();
-
-    VERIFY(m_display != nullptr);
-
-    m_vk_display = m_display->get();
+    context.vk_display = context.display->get();
+    VERIFY(context.vk_display);
 
     // TODO Choose display mode
-    m_display_mode = m_display->get_mode_properties().front().displayModeProperties.displayMode;
+    m_display_mode = context.display->get_mode_properties().front().displayModeProperties.displayMode;
 
-    m_display_plane_index = m_display->get_plane_index();
+    m_display_plane_index = context.display->get_plane_index();
 
-    log_vulkan.info("Chose display {}\n", m_display_index);
+    auto &properties = context.display->get_properties();
+    std::string name{properties.displayProperties.displayName};
+    log_vulkan.info("Chose display {}\n", name);
     log_vulkan.info("Chose display plane {}\n", m_display_plane_index);
 
     Ensures(m_display_plane_index != std::numeric_limits<uint32_t>::max());
 
     vk::DisplayPlaneInfo2KHR plane_info_key{m_display_mode, m_display_plane_index};
-    auto capabilities = vk_physical_device.getDisplayPlaneCapabilities2KHR(plane_info_key);
+    auto capabilities = context.vk_physical_device.getDisplayPlaneCapabilities2KHR(plane_info_key);
 
     auto extent = capabilities.capabilities.maxDstExtent;
 
@@ -55,16 +54,19 @@ Display_surface::Display_surface(vk::Instance     vk_instance,
         extent
     };
 
-    m_vk_surface = vk_instance.createDisplayPlaneSurfaceKHRUnique(surface_create_info);
+    m_vk_surface = context.vk_instance.createDisplayPlaneSurfaceKHRUnique(surface_create_info);
 
     log_vulkan.trace("Created surface {} x {} on plane index {}\n",
                      extent.width,
                      extent.height,
                      m_display_plane_index);
 
-    Surface::get_properties(vk_physical_device);
+    Surface::get_properties(context);
+
+    context.vk_surface = m_vk_surface.get();
 
     Ensures(m_vk_surface);
+    Ensures(context.vk_surface);
 }
 
 } // namespace vipu

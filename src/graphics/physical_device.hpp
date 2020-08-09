@@ -11,10 +11,8 @@
 namespace vipu
 {
 
-class Configuration;
+class Context;
 class Display;
-class Instance;
-class Surface;
 
 struct Queue_family_indices
 {
@@ -27,27 +25,22 @@ class Physical_device
 public:
     Physical_device() = default;
 
-    Physical_device(Configuration      *configuration,
-                    Instance           *instance,
-                    vk::PhysicalDevice  physical_device);
+    Physical_device(Context &context, vk::PhysicalDevice vk_physical_device);
 
     // Only to be used with Display WSI
-    void scan_displays();
+    void scan_displays(Context &context);
 
     // Only to be used with Display WSI
-    auto choose_display()
+    auto choose_display(bool use_current_display)
     -> Display *;
 
-    auto choose_queue_family_indices(Surface *surface)
+    auto choose_queue_family_indices(Context &context)
     -> Queue_family_indices;
 
     auto get()
     -> vk::PhysicalDevice;
 
 private:
-    Configuration                          *m_configuration{nullptr};
-    Instance                               *m_instance     {nullptr};
-    vk::Instance                            m_vk_instance;
     vk::PhysicalDevice                      m_vk_physical_device;
     std::vector<vk::ExtensionProperties>    m_extensions;
     vk::PhysicalDeviceProperties2           m_properties;

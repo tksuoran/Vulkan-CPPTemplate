@@ -203,8 +203,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_executable(executable
     src/main.cpp
-    src/graphics/configuration.cpp
-    src/graphics/configuration.hpp
+    src/graphics/context.hpp
     src/graphics/device.cpp
     src/graphics/device.hpp
     src/graphics/display.cpp
@@ -221,6 +220,8 @@ add_executable(executable
     src/graphics/surface.hpp
     src/graphics/swapchain.cpp
     src/graphics/swapchain.hpp
+    src/graphics/vulkan.cpp
+    src/graphics/vulkan.hpp
     src/graphics/xcb_surface.cpp
     src/graphics/xcb_surface.hpp
     src/log/log.cpp

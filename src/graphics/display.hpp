@@ -38,17 +38,24 @@ public:
     auto get()
     -> vk::DisplayKHR;
 
+    auto get_properties()
+    -> const vk::DisplayProperties2KHR &;
+
     auto get_mode_properties()
     -> const std::vector<vk::DisplayModeProperties2KHR> &;
 
     auto get_plane_index()
     -> uint32_t;
 
+    auto is_any_current()
+    -> bool;
+
 private:
     vk::DisplayKHR                              m_vk_display;
     vk::DisplayProperties2KHR                   m_properties;
     std::vector<vk::DisplayModeProperties2KHR>  m_mode_properties;
     std::vector<Plane>                          m_planes;
+    bool                                        m_is_any_current{false};
 
     uint32_t                                    m_display_index      {std::numeric_limits<uint32_t>::max()};
     uint32_t                                    m_display_plane_index{std::numeric_limits<uint32_t>::max()};

@@ -1,25 +1,27 @@
 #include <gsl/gsl>
 
 #include "graphics/surface.hpp"
+#include "graphics/context.hpp"
 #include "graphics/instance.hpp"
 #include "graphics/log.hpp"
 
 namespace vipu
 {
 
-void Surface::get_properties(vk::PhysicalDevice vk_physical_device)
+void Surface::get_properties(Context &context)
 {
-    Expects(m_vk_surface);
+    auto vk_surface = m_vk_surface.get();
+    VERIFY(vk_surface);
 
     log_vulkan.trace("Surface properties:\n");
 
-    std::vector<vk::PresentModeKHR> present_modes = vk_physical_device.getSurfacePresentModesKHR(m_vk_surface.get());
+    std::vector<vk::PresentModeKHR> present_modes = context.vk_physical_device.getSurfacePresentModesKHR(vk_surface);
     for (auto present_mode : present_modes)
     {
         log_vulkan.trace("    present mode : {}\n", vk::to_string(present_mode));
     }
 
-    m_surface_capabilities = vk_physical_device.getSurfaceCapabilitiesKHR(m_vk_surface.get());
+    m_surface_capabilities = context.vk_physical_device.getSurfaceCapabilitiesKHR(vk_surface);
     log_vulkan.trace("    minImageCount           : {}\n",      m_surface_capabilities.minImageCount);
     log_vulkan.trace("    maxImageCount           : {}\n",      m_surface_capabilities.maxImageCount);
     log_vulkan.trace("    currentExtent           : {} x {}\n", m_surface_capabilities.currentExtent.width, m_surface_capabilities.currentExtent.height);

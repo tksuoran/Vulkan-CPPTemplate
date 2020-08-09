@@ -1,25 +1,24 @@
 #include "fmt/format.h"
 #include "gsl/gsl"
 
-#include "graphics/log.hpp"
-#include "graphics/vulkan.hpp"
 #include "graphics/device.hpp"
+#include "graphics/context.hpp"
+#include "graphics/log.hpp"
 #include "graphics/physical_device.hpp"
 #include "graphics/surface.hpp"
+#include "graphics/vulkan.hpp"
 
 namespace vipu
 {
 
-Device::Device(Physical_device *physical_device,
-               Surface         *surface)
+Device::Device(Context &context)
 {
-    Expects(physical_device != nullptr);
-    Expects(surface != nullptr);
+    Expects(context.physical_device != nullptr);
+    Expects(context.surface != nullptr);
 
-    m_vk_physical_device = physical_device->get();
-    VERIFY(m_vk_physical_device);
+    Expects(context.vk_physical_device);
 
-    m_queue_family_indices = physical_device->choose_queue_family_indices(surface);
+    m_queue_family_indices = context.physical_device->choose_queue_family_indices(context);
 
     std::array<const float, 1> priorities {0.0f};
 
@@ -114,8 +113,9 @@ Device::Device(Physical_device *physical_device,
     // -    VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT
     // -    VkPhysicalDeviceVulkanMemoryModelFeatures
     // -    VkPhysicalDeviceYcbcrImageArraysFeaturesEXT
-    std::array<char const *, 1> device_extension_names = {
-        VK_KHR_SWAPCHAIN_EXTENSION_NAME
+    std::array<char const *, 2> device_extension_names = {
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+        VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME
     };
 
     std::array<char const *, 1> layer_names = {
@@ -133,13 +133,15 @@ Device::Device(Physical_device *physical_device,
         &features
     };
 
-    m_vk_device = m_vk_physical_device.createDeviceUnique(device_create_info);
+    m_vk_device = context.vk_physical_device.createDeviceUnique(device_create_info);
 
     vk::DeviceQueueInfo2 queue_info{
         vk::DeviceQueueCreateFlags(),
         m_queue_family_indices.graphics,
         0
     };
+
+    VULKAN_HPP_DEFAULT_DISPATCHER.init(m_vk_device.get());
 
     m_vk_queue = m_vk_device->getQueue2(queue_info);
 
@@ -161,10 +163,10 @@ auto Device::get_queue_family_indices()
     return m_queue_family_indices;
 }
 
-auto Device::get_surface_formats(vk::SurfaceKHR vk_surface)
--> std::vector<vk::SurfaceFormatKHR>
+auto Device::get_queue()
+-> vk::Queue
 {
-    return m_vk_physical_device.getSurfaceFormatsKHR(vk_surface);
+    return m_vk_queue;
 }
 
 

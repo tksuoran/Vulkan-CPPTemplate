@@ -10,7 +10,8 @@ namespace vipu
 Display::Display(vk::PhysicalDevice         vk_physical_device,
                  uint32_t                   display_index,
                  vk::DisplayProperties2KHR &properties)
-:   m_properties   {properties}
+:   m_vk_display   {properties.displayProperties.display}
+,   m_properties   {properties}
 ,   m_display_index{display_index}
 {
     Expects(vk_physical_device);
@@ -35,31 +36,50 @@ Display::Display(vk::PhysicalDevice         vk_physical_device,
 
     auto plane_properties = vk_physical_device.getDisplayPlaneProperties2KHR();
     log_vulkan.trace("\tPlanes: {}\n", plane_properties.size());
-    m_planes.resize(plane_properties.size());
+    m_planes.reserve(plane_properties.size());
     m_display_plane_index = std::numeric_limits<uint32_t>::max();
     for (uint32_t plane_index = 0;
         plane_index < plane_properties.size();
         ++plane_index)
     {
-        m_planes[plane_index] = Plane(vk_physical_device,
-                                      m_vk_display,
-                                      plane_index,
-                                      plane_properties[plane_index]);
+        m_planes.emplace_back(vk_physical_device,
+                              m_vk_display,
+                              plane_index,
+                              plane_properties[plane_index]);
         auto &plane = m_planes[plane_index];
         if (plane.current && plane.supported)
         {
+            m_is_any_current = true;
             m_display_plane_index = plane_index;
         }
     }
 
-    VERIFY(m_display_plane_index != std::numeric_limits<uint32_t>::max());
-    log_vulkan.info("Chose display plane {}\n", m_display_plane_index);
+    // If no plane was current, find supported plane
+    if (m_display_plane_index == std::numeric_limits<uint32_t>::max())
+    {
+        for (uint32_t plane_index = 0;
+            plane_index < plane_properties.size();
+            ++plane_index)
+        {
+            auto &plane = m_planes[plane_index];
+            if (plane.supported)
+            {
+                m_display_plane_index = plane_index;
+            }
+        }
+    }
 }
 
 auto Display::get()
 -> vk::DisplayKHR
 {
     return m_vk_display;
+}
+
+auto Display::get_properties()
+-> const vk::DisplayProperties2KHR &
+{
+    return m_properties;
 }
 
 auto Display::get_mode_properties()
@@ -72,6 +92,12 @@ auto Display::get_plane_index()
 -> uint32_t
 {
     return m_display_plane_index;
+}
+
+auto Display::is_any_current()
+-> bool
+{
+    return m_is_any_current;
 }
 
 Plane::Plane(vk::PhysicalDevice              vk_physical_device,

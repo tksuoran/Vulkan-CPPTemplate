@@ -8,9 +8,7 @@
 namespace vipu
 {
 
-class Configuration;
-class Instance;
-class Physical_device;
+class Context;
 
 auto surface_format_score(vk::Format format)
 -> int;
@@ -25,8 +23,8 @@ public:
         eDisplay
     };
 
-    auto choose_format(vk::PhysicalDevice vk_physical_device)
-    -> vk::SurfaceFormatKHR;
+    // auto choose_format(Context &context)
+    // -> vk::SurfaceFormatKHR;
 
     auto get()
     -> vk::SurfaceKHR;
@@ -38,7 +36,7 @@ public:
     -> const vk::SurfaceCapabilitiesKHR &;
 
 protected:
-    void get_properties(vk::PhysicalDevice vk_physical_device);
+    void get_properties(Context &context);
 
     std::vector<vk::PresentModeKHR> m_present_modes;
     vk::SurfaceCapabilitiesKHR      m_surface_capabilities;
